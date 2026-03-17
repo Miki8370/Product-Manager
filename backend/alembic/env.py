@@ -10,6 +10,10 @@ from models.produts import Category, Products
 from models.cart import Cart, CartItem
 from models.order import Order, OrderItem
 from models.payment import Payment
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -62,15 +66,21 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    DATABASE_URL = os.getenv("DATABASE_URL")
+
+    if not DATABASE_URL:
+        raise Exception("DATABASE_URL is not set")
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        {"sqlalchemy.url": DATABASE_URL},
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata
         )
 
         with context.begin_transaction():
