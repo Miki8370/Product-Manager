@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from router import registration, auth, admin, category, products
+from router import registration, auth, admin, category, products, cart, orders, payment
 from services.admin_starter import create_admin
 from database.connection import SessionLocal
 
@@ -10,6 +10,9 @@ app.include_router(auth.router)
 app.include_router(admin.router)
 app.include_router(category.router)
 app.include_router(products.router)
+app.include_router(cart.router)
+app.include_router(orders.router)
+app.include_router(payment.router)
 
 
 @app.on_event("startup")

@@ -7,7 +7,9 @@ from alembic import context
 from database.connection import Base
 from models.users import User
 from models.produts import Category, Products
-
+from models.cart import Cart, CartItem
+from models.order import Order, OrderItem
+from models.payment import Payment
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
