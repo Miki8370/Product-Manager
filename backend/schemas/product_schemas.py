@@ -5,6 +5,8 @@ class CategoryRequest(BaseModel):
 
 
 class ProductCreate(BaseModel):
+    name: str
+    description: str
     brand: str
     model: str
     quality: str
