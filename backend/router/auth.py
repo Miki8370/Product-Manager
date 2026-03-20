@@ -4,6 +4,8 @@ from database.connection import get_db
 from models.users import User
 from schemas.user_schema import LoginRequest
 from core.security import verify_password, create_access_token
+from dependencies.auth import get_current_user
+
 
 router = APIRouter()
 
@@ -26,4 +28,15 @@ async def login(user: LoginRequest, db: Session = Depends(get_db)):
     return {
         "access_token": token,
         "token_type": "bearer"
+    }
+
+@router.get("/users/me")
+def get_current_user(current_user: User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+        "role": current_user.role.value,
+        "is_approved": current_user.is_approved,
+        "created_at": current_user.created_at.isoformat(),
     }
