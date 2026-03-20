@@ -37,6 +37,19 @@ def approve_users(user_id: int, db: Session = Depends(get_db), admin=Depends(adm
     db.commit()
     return {"message": "User rejected"}
 
+
+@router.patch("/users/{user_id}/is_admin")
+def approve_users(user_id: int, db: Session = Depends(get_db), admin=Depends(admin_required)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(404, "User not found")
+    
+    user.is_admin = True
+    db.commit()
+    return {"message": "User approved"}
+
+
+
 @router.get("/users")
 def get_users(db: Session = Depends(get_db), admin = Depends(admin_required)):
     users = db.query(User).all()

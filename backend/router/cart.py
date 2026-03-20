@@ -64,3 +64,20 @@ def remove_item(item_id: int, db: Session = Depends(get_db), user = Depends(get_
     db.commit()
 
     return {"message": "Item removed"}
+
+@router.put("/item/{item_id}")
+def update_quantity(item_id: int, quantity: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    item = db.query(CartItem).filter(CartItem.id == item_id).first()
+    
+    if not item:
+        raise HTTPException(404, "Item not found")
+    
+    if quantity <= 0:
+        db.delete(item)
+        db.commit()
+        return {"message": "Item removed"}
+    
+    item.quantity = quantity
+    db.commit()
+    
+    return {"message": "Quantity updated"}
