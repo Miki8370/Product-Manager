@@ -65,7 +65,7 @@ def remove_item(item_id: int, db: Session = Depends(get_db), user = Depends(get_
 
     return {"message": "Item removed"}
 
-@router.put("/item/{item_id}")
+@router.put("/item/update/{item_id}")
 def update_quantity(item_id: int, quantity: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
     item = db.query(CartItem).filter(CartItem.id == item_id).first()
     
