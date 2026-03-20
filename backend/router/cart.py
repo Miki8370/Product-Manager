@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from database.connection import get_db
 from models.cart import Cart, CartItem
@@ -8,6 +9,9 @@ from schemas.cart_schema import AddToCartRequest
 from dependencies.auth import get_current_user
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
+
+class QuantityUpdate(BaseModel):
+    quantity: int
 
 @router.post("/add")
 def add_to_cart(data: AddToCartRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
@@ -66,11 +70,13 @@ def remove_item(item_id: int, db: Session = Depends(get_db), user = Depends(get_
     return {"message": "Item removed"}
 
 @router.put("/item/update/{item_id}")
-def update_quantity(item_id: int, quantity: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
+def update_quantity(item_id: int, request: QuantityUpdate, db: Session = Depends(get_db), user = Depends(get_current_user)):
     item = db.query(CartItem).filter(CartItem.id == item_id).first()
     
     if not item:
         raise HTTPException(404, "Item not found")
+    
+    quantity = request.quantity
     
     if quantity <= 0:
         db.delete(item)
