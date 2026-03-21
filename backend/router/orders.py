@@ -299,3 +299,29 @@ def get_order_detail(order_id: int, db: Session = Depends(get_db),user = Depends
         },
         "items": items
     }
+
+
+@router.patch("/{order_id}/status")
+def update_order_status(
+    order_id: int,
+    status: str,
+    db: Session = Depends(get_db),
+    admin = Depends(admin_required)
+):
+    order = db.query(Order).filter(Order.id == order_id).first()
+    
+    if not order:
+        raise HTTPException(404, "Order not found")
+    
+    valid_statuses = ["pending_payment", "payment_verified", "processing", "shipped", "delivered", "cancelled"]
+    if status not in valid_statuses:
+        raise HTTPException(400, f"Invalid status. Must be one of: {valid_statuses}")
+    
+    order.status = status
+    db.commit()
+    
+    return {
+        "message": f"Order #{order_id} status updated to {status}",
+        "order_id": order_id,
+        "status": status
+    }
