@@ -301,7 +301,7 @@ def get_order_detail(order_id: int, db: Session = Depends(get_db),user = Depends
     }
 
 
-@router.patch("/{order_id}/status")
+@router.put("/{order_id}/status")
 def update_order_status(
     order_id: int,
     status: str,
