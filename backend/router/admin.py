@@ -51,8 +51,17 @@ def approve_users(user_id: int, db: Session = Depends(get_db), admin=Depends(adm
 
 
 @router.get("/users")
-def get_users(db: Session = Depends(get_db), admin = Depends(admin_required)):
+def get_all_users(db: Session = Depends(get_db), admin = Depends(admin_required)):
     users = db.query(User).all()
-
-    return users
-
+    
+    result = []
+    for user in users:
+        result.append({
+            "id": user.id,
+            "name": f"{user.first_name} {user.last_name}".strip() or user.username,
+            "email": user.email,
+            "is_approved": user.is_approved,
+            "created_at": user.created_at
+        })
+    
+    return result
