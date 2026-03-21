@@ -325,3 +325,31 @@ def update_order_status(
         "order_id": order_id,
         "status": status
     }
+
+
+
+@router.get("/admin/orders")
+def get_all_orders(
+    db: Session = Depends(get_db),
+    admin = Depends(admin_required)
+):
+    orders = db.query(Order).all()
+    
+    result = []
+    for order in orders:
+        payment = db.query(Payment).filter(Payment.order_id == order.id).first()
+        user = order.user
+        user_name = f"{user.first_name} {user.last_name}".strip() if user.first_name or user.last_name else user.username
+        
+        result.append({
+            "id": order.id,
+            "order_date": order.order_date,
+            "status": order.status,
+            "total_amount": order.total_amount,
+            "payment_method": order.payment_method,
+            "payment_status": payment.status if payment else None,
+            "item_count": len(order.items),
+            "user_name": user_name
+        })
+    
+    return result
