@@ -313,7 +313,7 @@ def update_order_status(
     if not order:
         raise HTTPException(404, "Order not found")
     
-    valid_statuses = ["pending_payment", "payment_verified", "processing", "shipped", "delivered", "cancelled"]
+    valid_statuses = ["pending_payment", "payment_verified", "processing", "completed", "cancelled"]
     if status_update.status not in valid_statuses:
         raise HTTPException(400, f"Invalid status. Must be one of: {valid_statuses}")
     
