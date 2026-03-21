@@ -150,12 +150,14 @@ def get_pending_verifications(
         order = payment.order
         user = order.user
         
+        user_name = f"{user.first_name} {user.last_name}".strip() if user.first_name or user.last_name else user.username
+        
         result.append({
             "payment_id": payment.id,
             "order_id": order.id,
             "technician": {
                 "id": user.id,
-                "name": user.name,  
+                "name": user_name,
                 "email": user.email
             },
             "amount": payment.amount,
