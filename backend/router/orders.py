@@ -353,3 +353,43 @@ def get_all_orders(
         })
     
     return result
+
+@router.get("/admin/order/{order_id}")
+def get_order_detail_admin(
+    order_id: int,
+    db: Session = Depends(get_db),
+    admin = Depends(admin_required)
+):
+    order = db.query(Order).filter(Order.id == order_id).first()
+    
+    if not order:
+        raise HTTPException(404, "Order not found")
+    
+    payment = db.query(Payment).filter(Payment.order_id == order.id).first()
+    
+    items = []
+    for item in order.items:
+        product = db.query(Products).filter(Products.id == item.product_id).first()
+        items.append({
+            "product_id": item.product_id,
+            "product_name": product.name if product else "Unknown",
+            "quantity": item.quantity,
+            "price": item.price_at_time,
+            "subtotal": item.price_at_time * item.quantity
+        })
+    
+    return {
+        "id": order.id,
+        "order_date": order.order_date,
+        "status": order.status,
+        "total_amount": order.total_amount,
+        "payment_method": order.payment_method,
+        "payment": {
+            "id": payment.id if payment else None,
+            "status": payment.status if payment else None,
+            "voucher_image": payment.voucher_image if payment and payment.payment_method == "voucher" else None,
+            "verified_at": payment.verified_at if payment else None,
+            "rejection_reason": payment.rejection_reason if payment else None
+        },
+        "items": items
+    }
