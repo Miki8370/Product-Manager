@@ -2,6 +2,10 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 
+class StatusUpdate(BaseModel):
+    status: str
+
+
 class OrderItemResponse(BaseModel):
     product_id: int
     product_name: str

@@ -11,7 +11,7 @@ from models.order import Order, OrderItem, OrderStatus
 from models.payment import Payment, PaymentStatus, PaymentMethod
 from models.cart import Cart, CartItem
 from models.produts import Products
-from schemas.order_schemas import OrderResponse, OrderDetailResponse
+from schemas.order_schemas import OrderResponse, OrderDetailResponse, StatusUpdate
 from schemas.payment import PaymentCreate, PaymentUploadVoucher, PaymentVerify
 
 router = APIRouter(prefix="/order", tags=["Order"])
@@ -304,7 +304,7 @@ def get_order_detail(order_id: int, db: Session = Depends(get_db),user = Depends
 @router.patch("/{order_id}/status")
 def update_order_status(
     order_id: int,
-    status: str,
+    status_update: StatusUpdate,
     db: Session = Depends(get_db),
     admin = Depends(admin_required)
 ):
@@ -314,18 +314,17 @@ def update_order_status(
         raise HTTPException(404, "Order not found")
     
     valid_statuses = ["pending_payment", "payment_verified", "processing", "shipped", "delivered", "cancelled"]
-    if status not in valid_statuses:
+    if status_update.status not in valid_statuses:
         raise HTTPException(400, f"Invalid status. Must be one of: {valid_statuses}")
     
-    order.status = status
+    order.status = status_update.status
     db.commit()
     
     return {
-        "message": f"Order #{order_id} status updated to {status}",
+        "message": f"Order #{order_id} status updated to {status_update.status}",
         "order_id": order_id,
-        "status": status
+        "status": status_update.status
     }
-
 
 @router.get("/admin/orders")
 def get_all_orders(
